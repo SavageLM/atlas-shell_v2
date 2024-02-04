@@ -39,6 +39,31 @@ int _strcmp(char *str1, char *str2)
 }
 
 /**
+ * _strncmp - compares 2 strings until limit & shows value upon reaching
+ *            difference
+ * @str1: string 1
+ * @str2: string 2
+ * @limit: limit to which strings are compared
+ * Return: value of difference
+ */
+
+int _strncmp(char *str1, char *str2, int limit)
+{
+	int iter = 0;
+
+	if (!str1 || !str2)
+		return (-1);
+	while (
+		str1[iter] == str2[iter] &&
+		(str1[iter] || str2[iter]) &&
+		iter < limit - 1
+	)
+		iter++;
+	iter = (str1[iter] - str2[iter]);
+	return (iter);
+}
+
+/**
  * _strlen - returns length of input string
  * @str: string to find length
  * Return: number of characters in string
@@ -75,32 +100,4 @@ char *_strdup(char *str)
 	for (; iter_1 < iter_2; iter_1++)
 		copy[iter_1] = str[iter_1];
 	return (copy);
-}
-
-/**
- * str_concat - concatenates two given strings
- * @dest: string to which src is to be concatenated "to"
- * @src: string concatenated to dest "from"
- * Return: pointer to ret_str of concat in resp. freshly allocated memory
- */
-
-char *str_concat(char *dest, char *src)
-{
-	size_t dest_iter = 0, src_iter = 0, dest_len = 0, src_len = 0;
-	char *ret_str = 0;
-
-	if (!dest)
-		dest = "";
-	if (!src)
-		src = "";
-	dest_len = _strlen(dest), src_len = _strlen(src) + 1;
-	ret_str = malloc(sizeof(char) * (dest_len + src_len));
-	if (!ret_str)
-		return (NULL);
-	for (; dest[dest_iter]; dest_iter++)
-		ret_str[dest_iter] = dest[dest_iter];
-	for (; src[src_iter]; dest_iter++, src_iter++)
-		ret_str[dest_iter] = src[src_iter];
-	ret_str[dest_iter] = '\0';
-	return (ret_str);
 }

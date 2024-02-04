@@ -57,3 +57,50 @@ int _isdigit(int chr)
 {
 	return (chr >= '0' && chr <= '9' ? 1 : 0);
 }
+
+/**
+ * _strcat - concatenates 2 strings
+ * @dest: string 1 to have src appended to end
+ * @src: string 2 to append to end of dest
+ * Return: dest
+ */
+
+char *_strcat(char *dest, char *src)
+{
+	int iter_1 = _strlen(dest), iter_2 = 0;
+
+	if (!dest || !src)
+		return (NULL);
+	for (; src[iter_2]; iter_1++, iter_2++)
+		dest[iter_1] = src[iter_2];
+	dest[iter_1] = '\0';
+	return (dest);
+}
+
+/**
+ * str_concat - concatenates two given strings
+ * @dest: string to which src is to be concatenated "to"
+ * @src: string concatenated to dest "from"
+ * Return: pointer to ret_str of concat in resp. freshly allocated memory
+ */
+
+char *str_concat(char *dest, char *src)
+{
+	size_t dest_iter = 0, src_iter = 0, dest_len = 0, src_len = 0;
+	char *ret_str = 0;
+
+	if (!dest)
+		dest = "";
+	if (!src)
+		src = "";
+	dest_len = _strlen(dest), src_len = _strlen(src) + 1;
+	ret_str = malloc(sizeof(char) * (dest_len + src_len));
+	if (!ret_str)
+		return (NULL);
+	for (; dest[dest_iter]; dest_iter++)
+		ret_str[dest_iter] = dest[dest_iter];
+	for (; src[src_iter]; dest_iter++, src_iter++)
+		ret_str[dest_iter] = src[src_iter];
+	ret_str[dest_iter] = '\0';
+	return (ret_str);
+}
