@@ -24,7 +24,7 @@ void error_processor(char **cmd, char *program, char *input, int code)
 /**
  * error_13 - prints code 13 error message to stderr
  * @command: command that has been denied permission
- * @program: name of program
+ * @program: program name
  */
 
 static void error_13(char *command, char *program)
@@ -37,7 +37,7 @@ static void error_13(char *command, char *program)
 /**
  * error_127 - prints code 127 error message to stderr
  * @command: command that is not found
- * @program: name of program
+ * @program: program name
  */
 
 static void error_127(char *command, char *program)

@@ -28,8 +28,7 @@ char *_getenv(char *var_name)
 		{
 			env_var = _strdup(capture), capture = NULL;
 			for (iter = 0, env_copy = env_var;
-				(split[iter] = separator(&env_copy, "="));
-				iter++)
+				(split[iter] = separator(&env_copy, "=")); iter++)
 				;
 			value_str = _strdup(split[1]);
 			free(env_var), env_var = NULL;

@@ -89,8 +89,8 @@ static int empty_input(char *input)
 		for (; input[iter]; iter++)
 			if (
 				input[iter] == ' ' ||
-				input[iter] == '\n' ||
 				input[iter] == '\t' ||
+				input[iter] == '\n' ||
 				input[iter] == '\r'
 			)
 				spaces++;
