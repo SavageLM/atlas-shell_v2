@@ -46,10 +46,8 @@ static int builtin_cd(char *path)
  *
  *	if (getcwd(cwd, sizeof(cwd)))
  *		*cwd = '\0';
- *
  *	if (!path)
  *		path = getenvY("HOME");
- *
  * WIP
  *	if (!strcmp("-", command[1]))
  *	{
