@@ -172,7 +172,7 @@ static char **concat_slash_command(char **paths, char *command)
 	if (!result)
 		return (NULL);
 	slash_str[0] = '/', slash_str[1] = '\0';
-	slash_command = strcat(slash_str, command);
+	slash_command = _strcat(slash_str, command);
 	for (; paths[iter]; iter++)
 	{
 		path = str_concat(paths[iter], slash_command);

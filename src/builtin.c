@@ -19,11 +19,11 @@ int builtin(char *input, char **command)
 
 	if (command[0])
 	{
-		if (!strcmp(command[0], "cd"))
+		if (!_strcmp(command[0], "cd"))
 			builtin_cd(command[1]), match = 1;
-		else if (!strcmp(command[0], "env"))
+		else if (!_strcmp(command[0], "env"))
 			builtin_env(), match = 1;
-		else if (!strcmp(command[0], "exit"))
+		else if (!_strcmp(command[0], "exit"))
 			builtin_exit(command[1], input, command), match = 1;
 	}
 	return (match);
