@@ -211,7 +211,8 @@ static int fork_execute(char *input, char *name, char **cmd)
 		waitpid(launch, &status, 0);
 		flag = WEXITSTATUS(status);
 		if (flag == 2 && !isatty(STDIN_FILENO))
-			free_command(cmd), free(input), input = NULL, _exit(flag);
+			free_command(cmd), free(input), input = NULL,
+			env_free(), _exit(flag);
 	}
 	return (1);
 }

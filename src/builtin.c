@@ -57,7 +57,8 @@ static int builtin_cd(char *path, char *program)
 		{
 			oldpwd = _getenv("OLDPWD");
 			if (oldpwd)
-				cd_helper(oldpwd, program, &changed);
+				cd_helper(oldpwd, program, &changed),
+				printf("%s\n", oldpwd);
 			else
 				printf("%s\n", cwd);
 			free(oldpwd), oldpwd = NULL;
