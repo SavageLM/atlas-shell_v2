@@ -1,4 +1,4 @@
-#include "header/_sh.h"
+#include "_sh.h"
 
 static void error_13(char *cmd, char *program);
 static void error_127(char *command, char *program);

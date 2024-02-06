@@ -1,21 +1,21 @@
-#include "header/_sh.h"
+#include "_sh.h"
 
 /**
- * *_strcpy - copies src string to dest
- * @dest: destination memory
- * @src: string to copy terminated by \0
- * Return: pointer to dest
+ * _strcat - concatenates 2 strings
+ * @dest: string 1 to have src appended to end
+ * @src: string 2 to append to end of dest
+ * Return: dest
  */
 
-char *_strcpy(char *dest, char *src)
+char *_strcat(char *dest, char *src)
 {
-	int iter = 0;
+	int iter_1 = _strlen(dest), iter_2 = 0;
 
 	if (!dest || !src)
 		return (NULL);
-	for (; src[iter]; iter++)
-		dest[iter] = src[iter];
-	dest[iter] = '\0';
+	for (; src[iter_2]; iter_1++, iter_2++)
+		dest[iter_1] = src[iter_2];
+	dest[iter_1] = '\0';
 	return (dest);
 }
 
@@ -64,6 +64,25 @@ int _strncmp(char *str1, char *str2, int limit)
 }
 
 /**
+ * *_strcpy - copies src string to dest
+ * @dest: destination memory
+ * @src: string to copy terminated by \0
+ * Return: pointer to dest
+ */
+
+char *_strcpy(char *dest, char *src)
+{
+	int iter = 0;
+
+	if (!dest || !src)
+		return (NULL);
+	for (; src[iter]; iter++)
+		dest[iter] = src[iter];
+	dest[iter] = '\0';
+	return (dest);
+}
+
+/**
  * _strlen - returns length of input string
  * @str: string to find length
  * Return: number of characters in string
@@ -78,26 +97,4 @@ int _strlen(char *str)
 	for (; str[iter]; iter++)
 		;
 	return (iter);
-}
-
-/**
- * _strdup - duplicates string str & returns pointer to the duplicate
- * @str: object string
- * Return: pointer to duplicate of str
- */
-
-char *_strdup(char *str)
-{
-	char *copy = NULL;
-	int iter_1 = 0, iter_2 = 0;
-
-	if (!str)
-		return (NULL);
-	iter_2 = _strlen(str) + 1;
-	copy = malloc(sizeof(char) * iter_2);
-	if (!copy)
-		return (NULL);
-	for (; iter_1 < iter_2; iter_1++)
-		copy[iter_1] = str[iter_1];
-	return (copy);
 }

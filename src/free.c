@@ -1,4 +1,4 @@
-#include "header/_sh.h"
+#include "_sh.h"
 
 /**
  * free_command - frees memory related to command vector created in main

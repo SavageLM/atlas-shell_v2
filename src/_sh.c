@@ -1,9 +1,11 @@
-#include "header/_sh.h"
+#include "_sh.h"
 
 static void signal_SIGINT(int sig);
 static ssize_t prompt(char *prompt_str, char **input, size_t *len);
 static int empty_input(char *input);
 static int parse_input(char *input, char *command[], char *delim);
+
+p_dt data;
 
 /**
  * main - infinite loop responsible for prompt, calling parse/launch functions,
@@ -26,7 +28,7 @@ int main(int __attribute__((unused)) argc, char **argv)
 		if (prompt_ret < 0)
 			continue;
 		parse_input(input, command, SPC_DELIM);
-		launch_error = launch_manager(input, command);
+		launch_error = launch_manager(input, command, argv[0]);
 		if (launch_error == 13 || launch_error == 127)
 			error_processor(command, argv[0], input, launch_error);
 		free_command(command);
@@ -35,6 +37,43 @@ int main(int __attribute__((unused)) argc, char **argv)
 		fflush(stdout);
 	}
 	return (0);
+}
+
+/**
+ * env_load - allocates memory for env_list (adjustable copy of environ)
+ * Return: 0 upon success, -1 upon memory allocation failure
+*/
+
+int __attribute__ ((constructor)) env_load(void)
+{
+	size_t size = 0/* , iter = 0 */;
+
+	if (environ)
+	{
+		for (; environ[size]; size++)
+			;
+		data.env_list = _calloc(sizeof(char *) * (size + 1), 1);
+		if (!data.env_list)
+			return (-1);
+		_memcpy((char *)data.env_list, (char *)environ, size * sizeof(char *));
+		data.env_list_size = data.env_size = size;
+	}
+	return (0);
+}
+
+/**
+ * env_free - frees memory related to env_list (adjustable copy of environ)
+*/
+
+void __attribute__ ((destructor)) env_free(void)
+{
+	size_t added = 0;
+
+	if (*data.env_list)
+		for (; data.env_list[added]; added++)
+			free(data.env_list[added]), data.env_list[added] = NULL;
+	if (data.env_list)
+		free(data.env_list);
 }
 
 /**

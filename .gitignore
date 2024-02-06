@@ -1,4 +1,5 @@
 *~
-vgcore*
 *.o
 build
+vgcore*
+.vscode
