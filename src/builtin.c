@@ -113,11 +113,7 @@ static int builtin_env(void)
 	char **env_var = NULL;
 	int counter = 0;
 
-	if (data.env_list)
-		env_var = data.env_list;
-	else
-		env_var = environ;
-	for (; *env_var; ++env_var)
+	for (env_var = environ; *env_var; ++env_var)
 		printf("%s\n", *env_var), counter++;
 	return (counter ? 0 : -1);
 }
@@ -181,7 +177,6 @@ static int builtin_setenv(char *name, char *value)
 		_strcpy(data.env_list[iter], value_str);
 	else
 	{
-		data.env_list_size++;
 		env_cpy = _realloc(
 			(char *)data.env_list,
 			(iter) * sizeof(char *),
@@ -189,6 +184,7 @@ static int builtin_setenv(char *name, char *value)
 		if (!env_cpy)
 			return (-1);
 		_memcpy((char *)env_cpy, (char *)environ, iter * sizeof(char *));
+		data.env_list_size++;
 		env_cpy[iter] = _strdup(value_str);
 		env_cpy[iter + 1] = NULL;
 		data.env_list = environ = env_cpy;
