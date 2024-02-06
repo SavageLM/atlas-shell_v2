@@ -1,4 +1,4 @@
-#include "header/_sh.h"
+#include "_sh.h"
 
 static int check_PATH_PWD(void);
 static char **PATH_processing(char *command);
@@ -12,16 +12,17 @@ static int fork_execute(char *input, char *name, char **cmd);
  *         calling fork_execute if program exists & can be accessed
  * @input: CLI input
  * @cmd: vector of arguments retrieved from input
+ * @program: program name
  * Return: 0 success, 1 built-in called, otherwise respective err no.
  */
 
-int launch_manager(char *input, char **cmd)
+int launch_manager(char *input, char **cmd, char *program)
 {
 	int iter = 0, tag = 0, problem = 0;
 	char **full_paths = NULL;
 
 	problem = check_PATH_PWD();
-	if (builtin(input, cmd))
+	if (builtin(input, cmd, program))
 		return (1);
 	if (access(cmd[0], F_OK) == -1)
 	{

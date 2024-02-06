@@ -1,17 +1,21 @@
-SRCDIR := src
-BUILDDIR := build
 CC := gcc
 CFLAGS := -Werror -Wall -Wextra -pedantic -std=gnu89
+
+INCDIR := include
+SRCDIR := src
+BUILDDIR := build
+
 SRC := $(wildcard $(SRCDIR)/*.c)
-HEAD := $(SRCDIR)/header/_sh.h
 OBJ := $(addprefix $(BUILDDIR)/, $(patsubst %.c, %.o, $(notdir $(SRC))))
+HEAD := $(INCDIR)/_sh.h
+
 NAME := hsh
 
 all: link
 
 $(BUILDDIR)/%.o : $(SRCDIR)/%.c
 	@mkdir -p $(BUILDDIR)
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) -c -I$(INCDIR) $< -o $@
 
 link: $(OBJ)
 	$(CC) $(CFLAGS) $^ -o $(NAME)

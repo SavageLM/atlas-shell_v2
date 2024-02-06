@@ -1,4 +1,4 @@
-#include "header/_sh.h"
+#include "_sh.h"
 
 /**
  * separator - splits/tokenizes input string per delimiter(s)

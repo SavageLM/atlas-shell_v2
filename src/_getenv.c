@@ -1,4 +1,4 @@
-#include "header/_sh.h"
+#include "_sh.h"
 
 /**
  * _getenv - custom getenv function, retrieves env var value
@@ -16,14 +16,12 @@ char *_getenv(char *var_name)
 	if (!var_name)
 		return (NULL);
 	var_eq = str_concat(var_name, "=");
-	for (iter = 0, var_def = _strlen(var_eq); environ[iter]; iter++)
-	{
-		if (!_strncmp(environ[iter], var_eq, var_def))
+	for (iter = 0, var_def = _strlen(var_eq); data.env_list[iter]; iter++)
+		if (!_strncmp(data.env_list[iter], var_eq, var_def))
 		{
-			capture = environ[iter], found = 1;
+			capture = data.env_list[iter], found = 1;
 			break;
 		}
-	}
 	if (found)
 	{
 		if (_strlen(capture) != var_def)
