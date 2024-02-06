@@ -69,8 +69,8 @@ void __attribute__ ((destructor)) env_free(void)
 {
 	size_t added = 0;
 
-	if (*data.env_list)
-		for (; data.env_list[added]; added++)
+	if (data.env_list_size > data.env_size)
+		for (added = data.env_size; data.env_list[added]; added++)
 			free(data.env_list[added]), data.env_list[added] = NULL;
 	if (data.env_list)
 		free(data.env_list);
