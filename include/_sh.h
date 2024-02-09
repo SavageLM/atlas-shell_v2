@@ -5,6 +5,7 @@
 #define PATH_DELIM ":"
 #define MAX_LEN 1024
 
+#include <fcntl.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
