@@ -4,27 +4,27 @@
  * single_right - Function for handling right redirects
  * @filename: file to search for
  * @content: Output to write to file
+ * Return: 0 on success, otherwise returns -1
  * THESE ARE PLACEHOLDERS!!!! REPLACE
 */
 
-void single_right(filename, content)
+int single_right(char *filename, char *content)
 {
 /* SUDO CODE FOR FUNCTION*/
-
+	int fd = 0;
 	if (!filename)
-		return;
-	if (open(filename, O_RDWR) == -1)
+		return (-1);
+	fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 644)
+	if (fd != -1)
 	{
-		open(filename, O_CREAT, O_RDWR);
-		write(filename, content, 1024);
-		close(filename);
+		write(fd, content, MAX_WRITE)
+		close(fd);
 	}
 	else
 	{
-		/*Somehow clear the file*/
-		write(filename, content, 1024);
-		close(filename);
+		/*Handle error*/
 	}
+	return (0);
 }
 
 /**
@@ -34,21 +34,23 @@ void single_right(filename, content)
  * THESE ARE PLACEHOLDERS!!!! REPLACE
 */
 
-void double_right(filename, content)
+int double_right(char *filename, char *content)
 {
 /* SUDO CODE FOR FUNCTION*/
 
+	int fd = 0;
+
 	if (!filename)
-		return;
-	if (open(filename, O_APPEND) == -1)
+		return (-1);
+	fd = open(filename, O_WRONLY | O_CREAT | O_APPEND, 644)
+	if (fd != -1)
 	{
-		open(filename, O_CREAT, O_RDWR);
-		write(filename, content, 1024);
-		close(filename);
+		write(fd, content, MAX_WRITE)
+		close(fd);
 	}
 	else
 	{
-		write(filename, content, 1024);
-		close(filename);
+		/*Handle error*/
 	}
+	return (0);
 }
