@@ -26,17 +26,11 @@ int launcher(c_list *commands)
 	}
 	else
 	{
-		for (tmp = commands; tmp; tmp = tmp->next)
+		for (tmp = commands; tmp; tmp = tmp->next, cmd_dt.op_index++)
 		{
-			if (cmd_dt.op_array[commands->cmd_index - 1] == 0x1)
-			{
-				launch_error = launch_manager(commands->command);
-				if (launch_error == 13 || launch_error == 127)
-					error_processor(commands->command, launch_error);
-			}
-			else if (cmd_dt.op_array[commands->cmd_index - 1] == 0x5)
+			if (cmd_dt.op_array[cmd_dt.op_index] == 0x5)
 				single_right(commands);
-			else if (cmd_dt.op_array[commands->cmd_index - 1] == 0x6)
+			else if (cmd_dt.op_array[cmd_dt.op_index] == 0x6)
 				double_right(commands);
 		}
 	}
