@@ -14,7 +14,7 @@ static int parse_space(c_list *cmd);
 int parser(char *input)
 {
 	c_list *tmp = NULL;
-	int ops_parsed = 0, iter = 0;
+	int ops_parsed = 0;
 
 	if (!input)
 		return (-1);
