@@ -16,7 +16,7 @@ static int fork_execute(char *name, char **cmd);
 int launcher(c_list *commands)
 {
 	c_list *tmp = NULL;
-	int launch_error = 0;
+	int launch_error = 0, last = 0x0;
 
 	if (!cmd_dt.op_count)
 	{
@@ -28,10 +28,24 @@ int launcher(c_list *commands)
 	{
 		for (tmp = commands; tmp; tmp = tmp->next, cmd_dt.op_index++)
 		{
-			if (cmd_dt.op_array[cmd_dt.op_index] == 0x5)
-				single_right(commands);
+			if (cmd_dt.op_array[cmd_dt.op_index] == 0x1)
+				colon_operator(commands), last = 0x1;
+			else if (cmd_dt.op_array[cmd_dt.op_index] == 0x2)
+				continue;
+			else if (cmd_dt.op_array[cmd_dt.op_index] == 0x3)
+				continue;
+			else if (cmd_dt.op_array[cmd_dt.op_index] == 0x4)
+				continue;
+			else if (cmd_dt.op_array[cmd_dt.op_index] == 0x5)
+				single_right_redirect(commands), last = 0x5;
 			else if (cmd_dt.op_array[cmd_dt.op_index] == 0x6)
-				double_right(commands);
+				double_right_redirect(commands), last = 0x6;
+			else if (cmd_dt.op_array[cmd_dt.op_index] == 0x7)
+				single_left_redirect(commands), last = 0x7;
+			else if (cmd_dt.op_array[cmd_dt.op_index] == 0x8)
+				continue;
+			else if (!cmd_dt.op_array[cmd_dt.op_index] && last <= 0x4 && last != 0x3)
+				colon_operator(commands);
 		}
 	}
 	return (0);
