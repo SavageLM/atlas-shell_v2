@@ -56,6 +56,7 @@ typedef struct command_list
  * struct command_data - data bank for each command entered
  * @input: raw unprocessed command line input ending with line break
  * @cmd_count: total number of commands detected in parsed input
+ * @cmd_index: index to keep track of which commands have already been done
  * @op_count: total number of supported control/redirect operators detected
  * @op_array: sequence of detected control/redirect operators
  * @op_add: count to verify op added at each position
@@ -67,6 +68,7 @@ typedef struct command_data
 {
 	char *input;
 	int cmd_count;
+	int cmd_index;
 	int op_count;
 	int op_array[16];
 	int op_add;
@@ -103,11 +105,7 @@ char *_strdup(char *str);
 char *str_concat(char *dest, char *src);
 
 /* operators.c */
-int colon_operator(c_list *commands);
-int single_right_redirect(c_list *commands);
-int double_right_redirect(c_list *commands);
-int single_left_redirect(c_list *commands);
-int double_left_redirect(c_list *commands);
+int route_operators(c_list *commands);
 
 /* parse.c */
 int parser(char *input);
