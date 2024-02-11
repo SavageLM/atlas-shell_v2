@@ -16,10 +16,10 @@ char *_getenv(char *var_name)
 	if (!var_name)
 		return (NULL);
 	var_eq = str_concat(var_name, "=");
-	for (iter = 0, var_def = _strlen(var_eq); data.env_list[iter]; iter++)
-		if (!_strncmp(data.env_list[iter], var_eq, var_def))
+	for (iter = 0, var_def = _strlen(var_eq); prog.env_list[iter]; iter++)
+		if (!_strncmp(prog.env_list[iter], var_eq, var_def))
 		{
-			capture = data.env_list[iter], found = 1;
+			capture = prog.env_list[iter], found = 1;
 			break;
 		}
 	if (found)
@@ -33,7 +33,7 @@ char *_getenv(char *var_name)
 			value_str = _strdup(split[1]);
 			free(env_var), env_var = NULL;
 		}
-		free_command(split);
+		free_strv(split);
 	}
 	free(var_eq), var_eq = NULL;
 	return (value_str ? value_str : NULL);

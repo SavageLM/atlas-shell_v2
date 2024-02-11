@@ -3,9 +3,9 @@
 static void signal_SIGINT(int sig);
 static ssize_t prompt(char *prompt_str, char **input, size_t *len);
 static int empty_input(char *input);
-static int parse_input(char *input, char *command[], char *delim);
 
-p_dt data;
+p_dt prog;
+c_dt cmd_dt;
 
 /**
  * main - infinite loop responsible for prompt, calling parse/launch functions,
@@ -17,23 +17,20 @@ p_dt data;
 
 int main(int __attribute__((unused)) argc, char **argv)
 {
-	char *input = NULL, *command[MAX_LEN] = { NULL };
 	size_t input_len = 0;
-	int prompt_ret = 0, launch_error = 0;
+	int prompt_ret = 0;
 
+	prog.program = argv[0];
 	while (1)
 	{
+		cmd_dt.cmd_count = 0, cmd_dt.op_count = 0, cmd_dt.op_index = 0;
 		signal(SIGINT, signal_SIGINT);
-		prompt_ret = prompt("# ", &input, &input_len);
+		prompt_ret = prompt("# ", &cmd_dt.input, &input_len);
 		if (prompt_ret < 0)
 			continue;
-		parse_input(input, command, SPC_DELIM);
-		launch_error = launch_manager(input, command, argv[0]);
-		if (launch_error == 13 || launch_error == 127)
-			error_processor(command, argv[0], input, launch_error);
-		free_command(command);
-		if (input)
-			free(input), input = NULL;
+		parser(cmd_dt.input);
+		launcher(cmd_dt.commands);
+		free_cmd_dt();
 		fflush(stdout);
 	}
 	return (0);
@@ -52,11 +49,11 @@ int __attribute__ ((constructor)) env_load(void)
 	{
 		for (; environ[size]; size++)
 			;
-		data.env_list = _calloc(sizeof(char *) * (size + 1), 1);
-		if (!data.env_list)
+		prog.env_list = _calloc(sizeof(char *) * (size + 1), 1);
+		if (!prog.env_list)
 			return (-1);
-		_memcpy((char *)data.env_list, (char *)environ, size * sizeof(char *));
-		data.env_list_size = data.env_size = size;
+		_memcpy((char *)prog.env_list, (char *)environ, size * sizeof(char *));
+		prog.env_list_size = prog.env_size = size;
 	}
 	return (0);
 }
@@ -69,11 +66,11 @@ void __attribute__ ((destructor)) env_free(void)
 {
 	size_t added = 0;
 
-	if (data.env_list_size > data.env_size)
-		for (added = data.env_size; data.env_list[added]; added++)
-			free(data.env_list[added]), data.env_list[added] = NULL;
-	if (data.env_list)
-		free(data.env_list);
+	if (prog.env_list_size > prog.env_size)
+		for (added = prog.env_size; prog.env_list[added]; added++)
+			free(prog.env_list[added]), prog.env_list[added] = NULL;
+	if (prog.env_list)
+		free(prog.env_list);
 }
 
 /**
@@ -134,28 +131,4 @@ static int empty_input(char *input)
 			)
 				spaces++;
 	return (spaces == _strlen(input) ? 1 : 0);
-}
-
-/**
- * parse_input - parses/tokenizes input into string vector
- * @input: object string
- * @command: destination string vector
- * @delim: delimiter to be fed to splitting/tokenizing function
- * Return: 1 if input parsed to command, 0 if not, -1 upon improper input/delim
- */
-
-static int parse_input(char *input, char *command[], char *delim)
-{
-	int iter = 0;
-	char *extract_str = NULL, *inpt_cpy = NULL;
-
-	if (!input || !delim)
-		return (-1);
-	for (inpt_cpy = input; (extract_str = separator(&inpt_cpy, delim)); iter++)
-		command[iter] = extract_str;
-	if (extract_str)
-		extract_str = NULL;
-	if (inpt_cpy)
-		free(inpt_cpy), inpt_cpy = NULL;
-	return (iter ? 1 : 0);
 }
