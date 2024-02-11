@@ -16,7 +16,8 @@ void free_cmd_dt(void)
 			hold = cmd_dt.commands->next;
 			for (iter = 0; cmd_dt.commands->command[iter]; iter++)
 				if (cmd_dt.commands->command[iter])
-					free(cmd_dt.commands->command[iter]);
+					free(cmd_dt.commands->command[iter]),
+					cmd_dt.commands->command[iter] = NULL;
 			if (cmd_dt.commands->cmd_str)
 				free(cmd_dt.commands->cmd_str), cmd_dt.commands->cmd_str = NULL;
 			if (cmd_dt.commands)

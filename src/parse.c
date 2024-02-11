@@ -22,8 +22,8 @@ int parser(char *input)
 	ops_parsed = parse_ops(input);
 	if (!ops_parsed)
 		add_cmd(input, &cmd_dt.commands);
-	for (tmp = cmd_dt.commands; tmp; tmp = tmp->next, cmd_dt.cmd_count++)
-		parse_space(tmp), tmp->cmd_index = cmd_dt.cmd_count + 1;
+	for (tmp = cmd_dt.commands; tmp; tmp = tmp->next)
+		parse_space(tmp);
 	return (0);
 }
 
@@ -70,11 +70,15 @@ static int parse_ops(char *input)
 
 	if (!input)
 		return (-1);
-	for (inpt_cpy = input; (extract_str = separator(&inpt_cpy, OPS));)
+	for (
+		inpt_cpy = input;
+		(extract_str = separator(&inpt_cpy, OPS));
+		cmd_dt.cmd_count++
+	)
 		add_cmd(extract_str, &cmd_dt.commands);
 	if (extract_str)
 		extract_str = NULL;
-	if (inpt_cpy && cmd_dt.cmd_count)
+	if (inpt_cpy)
 		free(inpt_cpy), inpt_cpy = NULL;
 	return (cmd_dt.cmd_count ? 1 : 0);
 }

@@ -1,0 +1,16 @@
+AUTHORS
+build
+cd_dash.bash
+cd_dash_change_oldpwd.bash
+checker.bash
+cmd_to_existing_file.bash
+exit_no_arg_1.bash
+hsh
+hsh-debug
+include
+Makefile
+mf
+README.md
+src
+vgcore.42835
+vgcore.42892
