@@ -23,7 +23,8 @@ int main(int __attribute__((unused)) argc, char **argv)
 	prog.program = argv[0];
 	while (1)
 	{
-		cmd_dt.cmd_count = 0, cmd_dt.op_count = 0, cmd_dt.op_index = 0;
+		cmd_dt.cmd_count = 0, cmd_dt.op_count = 0;
+		cmd_dt.op_add = 0, cmd_dt.op_index = 0;
 		signal(SIGINT, signal_SIGINT);
 		prompt_ret = prompt("# ", &cmd_dt.input, &input_len);
 		if (prompt_ret < 0)

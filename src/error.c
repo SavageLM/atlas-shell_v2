@@ -16,7 +16,11 @@ void error_processor(char **cmd, int code)
 	else if (code == 127)
 		error_127(cmd[0]);
 	if (!isatty(STDIN_FILENO))
+	{
+		if (cmd_dt.op_count)
+			code = 0;
 		free_cmd_dt(), exit(code);
+	}
 }
 
 /**
