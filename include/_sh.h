@@ -87,7 +87,7 @@ int builtin(char **command);
 /* error.c */
 void error_processor(char **cmd, int code);
 
-/* free */
+/* free.c */
 void free_cmd_dt(void);
 void free_strv(char **command);
 
@@ -102,14 +102,17 @@ void *_realloc(void *memory, size_t old_size, size_t new_size);
 char *_strdup(char *str);
 char *str_concat(char *dest, char *src);
 
+/* operators.c */
+int colon_operator(c_list *commands);
+int single_right_redirect(c_list *commands);
+int double_right_redirect(c_list *commands);
+int single_left_redirect(c_list *commands);
+int double_left_redirect(c_list *commands);
+
 /* parse.c */
 int parser(char *input);
 
-/* redirects.c */
-int single_right(c_list *commands);
-int double_right(c_list *commands);
-
-/* separator1.c */
+/* separator.c */
 char *separator(char **input, char *delim);
 char *_strsep(char **str, const char *delim);
 size_t _strcspn(const char *str1, const char *str2);
