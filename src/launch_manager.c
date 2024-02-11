@@ -5,24 +5,58 @@ static char **PATH_processing(char *command);
 static int PATH_str_mem_calc(char *PATH_str, char *command);
 static char **remove_colons(char *chop);
 static char **concat_slash_command(char **paths, char *command);
-static int fork_execute(char *input, char *name, char **cmd);
+static int fork_execute(char *name, char **cmd);
+
+/**
+ * launcher - routes shell activity based on operator input
+ * @commands: command segment, possibly preceded or followed by operator
+ * Return: 0 upon success
+*/
+
+int launcher(c_list *commands)
+{
+	c_list *tmp = NULL;
+	int launch_error = 0;
+
+	if (!cmd_dt.op_count)
+	{
+		launch_error = launch_manager(commands->command);
+		if (launch_error == 13 || launch_error == 127)
+			error_processor(commands->command, launch_error);
+	}
+	else
+	{
+		for (tmp = commands; tmp; tmp = tmp->next)
+		{
+			if (cmd_dt.op_array[commands->cmd_index - 1] == 0x1)
+			{
+				launch_error = launch_manager(commands->command);
+				if (launch_error == 13 || launch_error == 127)
+					error_processor(commands->command, launch_error);
+			}
+			else if (cmd_dt.op_array[commands->cmd_index - 1] == 0x5)
+				single_right(commands);
+			else if (cmd_dt.op_array[commands->cmd_index - 1] == 0x6)
+				double_right(commands);
+		}
+	}
+	return (0);
+}
 
 /**
  * launch_manager - manages input cmd, filtering through builtin & access, then
  *         calling fork_execute if program exists & can be accessed
- * @input: CLI input
  * @cmd: vector of arguments retrieved from input
- * @program: program name
  * Return: 0 success, 1 built-in called, otherwise respective err no.
  */
 
-int launch_manager(char *input, char **cmd, char *program)
+int launch_manager(char **cmd)
 {
 	int iter = 0, tag = 0, problem = 0;
 	char **full_paths = NULL;
 
 	problem = check_PATH_PWD();
-	if (builtin(input, cmd, program))
+	if (builtin(cmd))
 		return (1);
 	if (access(cmd[0], F_OK) == -1)
 	{
@@ -34,7 +68,7 @@ int launch_manager(char *input, char **cmd, char *program)
 		for (iter = 0; full_paths[iter]; iter++)
 			if (!access(full_paths[iter], X_OK))
 			{
-				fork_execute(input, full_paths[iter], cmd), tag = 1;
+				fork_execute(full_paths[iter], cmd), tag = 1;
 				break;
 			}
 		for (iter = 0; full_paths[iter]; iter++)
@@ -47,7 +81,7 @@ int launch_manager(char *input, char **cmd, char *program)
 		{
 			if (problem == 1 && cmd[0][0] != '/')
 				return (127);
-			fork_execute(input, cmd[0], cmd), tag = 1;
+			fork_execute(cmd[0], cmd), tag = 1;
 		}
 		else if (!access(cmd[0], F_OK) && access(cmd[0], X_OK) == -1)
 			return (13);
@@ -185,18 +219,17 @@ static char **concat_slash_command(char **paths, char *command)
 
 /**
  * fork_execute - launches input command with its arguments
- * @input: command
  * @name: command name used for error messages
  * @cmd: arguments to the command
  * Return: 1 upon success, -1 if input or cmd NULL
  */
 
-static int fork_execute(char *input, char *name, char **cmd)
+static int fork_execute(char *name, char **cmd)
 {
 	pid_t launch = 0;
 	int status = 0, flag = 0;
 
-	if (!input || !cmd)
+	if (!name || !cmd)
 		return (-1);
 	launch = fork();
 	if (launch == -1)
@@ -204,15 +237,14 @@ static int fork_execute(char *input, char *name, char **cmd)
 	else if (launch == 0)
 	{
 		if (execve(name, cmd, environ) == -1)
-			perror(name), free(input), exit(EXIT_FAILURE);
+			perror(name), exit(EXIT_FAILURE);
 	}
 	else
 	{
 		waitpid(launch, &status, 0);
 		flag = WEXITSTATUS(status);
 		if (flag == 2 && !isatty(STDIN_FILENO))
-			free_command(cmd), free(input), input = NULL,
-			env_free(), _exit(flag);
+			free_cmd_dt(), env_free(), _exit(flag);
 	}
 	return (1);
 }
