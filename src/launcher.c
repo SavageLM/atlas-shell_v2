@@ -37,7 +37,7 @@ int launcher(c_list *commands)
 
 int launch_manager(char **cmd)
 {
-	int iter = 0, tag = 0, problem = 0;
+	int iter = 0, tag = 0, problem = 0, f_ex_err = 0;
 	char **full_paths = NULL;
 
 	problem = check_PATH_PWD();
@@ -53,7 +53,7 @@ int launch_manager(char **cmd)
 		for (iter = 0; full_paths[iter]; iter++)
 			if (!access(full_paths[iter], X_OK))
 			{
-				fork_execute(full_paths[iter], cmd), tag = 1;
+				f_ex_err = fork_execute(full_paths[iter], cmd), tag = 1;
 				break;
 			}
 		for (iter = 0; full_paths[iter]; iter++)
@@ -66,12 +66,12 @@ int launch_manager(char **cmd)
 		{
 			if (problem == 1 && cmd[0][0] != '/')
 				return (127);
-			fork_execute(cmd[0], cmd), tag = 1;
+			f_ex_err = fork_execute(cmd[0], cmd), tag = 1;
 		}
 		else if (!access(cmd[0], F_OK) && access(cmd[0], X_OK) == -1)
 			return (13);
 	}
-	return (!tag ? 127 : 0);
+	return (!tag ? 127 : f_ex_err ? f_ex_err : 0);
 }
 
 /**
@@ -234,5 +234,5 @@ static int fork_execute(char *name, char **cmd)
 		)
 			free_cmd_dt(), env_free(), _exit(flag);
 	}
-	return (1);
+	return (flag);
 }
