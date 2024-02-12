@@ -7,6 +7,7 @@
 #define MAX_LEN 1024
 #define MAX_WRITE (1024 * 1024 * 2)
 
+#include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <stdio.h>

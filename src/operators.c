@@ -153,14 +153,24 @@ static int single_left_redirect(c_list *commands)
 	{
 		dup2(fd, STDIN_FILENO);
 		launch_error = launch_manager(commands->command);
-		if (launch_error == 13 || launch_error == 127)
+		if (launch_error)
 			error_processor(commands->command, launch_error);
 		close(fd);
 		dup2(redir_in, STDIN_FILENO);
 		close(redir_in);
 	}
 	else
+	{
+		if (errno == ENOENT)
+		{
+			fprintf(
+				stderr, "%s: 1: cannot open %s: No such file\n",
+				prog.program, commands->next->command[0]
+			);
+			error_processor(commands->command, 2);
+		}
 		return (-1);
+	}
 	return (0);
 }
 
