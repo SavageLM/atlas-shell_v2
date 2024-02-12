@@ -153,7 +153,7 @@ static int single_left_redirect(c_list *commands)
 	{
 		dup2(fd, STDIN_FILENO);
 		launch_error = launch_manager(commands->command);
-		if (launch_error == 13 || launch_error == 127)
+		if (launch_error == 2 || launch_error == 13 || launch_error == 127)
 			error_processor(commands->command, launch_error);
 		close(fd);
 		dup2(redir_in, STDIN_FILENO);
