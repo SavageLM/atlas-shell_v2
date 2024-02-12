@@ -25,6 +25,11 @@ void error_processor(char **cmd, int code)
 			)
 		)
 			code = 0;
+		if (
+			cmd_dt.op_array[cmd_dt.op_index] == 0x1 &&
+			cmd_dt.cmd_index < cmd_dt.cmd_count
+		)
+			return;
 		free_cmd_dt(), exit(code);
 	}
 }
