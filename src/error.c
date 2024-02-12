@@ -15,6 +15,8 @@ void error_processor(char **cmd, int code)
 		error_13(cmd[0]);
 	else if (code == 127)
 		error_127(cmd[0]);
+	else
+	
 	if (!isatty(STDIN_FILENO) && cmd_dt.op_array[cmd_dt.op_index] != 0x4)
 	{
 		if (cmd_dt.op_count && cmd_dt.op_array[cmd_dt.op_index] != 0x2)
