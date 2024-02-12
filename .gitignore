@@ -4,3 +4,4 @@ build
 *.bash
 vgcore*
 .vscode
+test

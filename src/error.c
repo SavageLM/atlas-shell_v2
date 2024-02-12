@@ -1,46 +1,45 @@
 #include "_sh.h"
 
-static void error_13(char *cmd, char *program);
-static void error_127(char *command, char *program);
+static void error_13(char *cmd);
+static void error_127(char *command);
 
 /**
  * error_processor - processes errors suitably respective to error code
  * @cmd: command vector
- * @program: name of shell application
- * @input: CLI input
  * @code: error code
 */
 
-void error_processor(char **cmd, char *program, char *input, int code)
+void error_processor(char **cmd, int code)
 {
 	if (code == 13)
-		error_13(cmd[0], program);
+		error_13(cmd[0]);
 	else if (code == 127)
-		error_127(cmd[0], program);
+		error_127(cmd[0]);
 	if (!isatty(STDIN_FILENO))
-		free_command(cmd), free(input), input = NULL, exit(code);
+	{
+		if (cmd_dt.op_count)
+			code = 0;
+		free_cmd_dt(), exit(code);
+	}
 }
 
 /**
  * error_13 - prints code 13 error message to stderr
  * @command: command that has been denied permission
- * @program: program name
  */
 
-static void error_13(char *command, char *program)
+static void error_13(char *command)
 {
 /*	fprintf(stderr, "%s: 1: %s: Permission denied\n", prog, command);*/
-	(void)program;
 	perror(command);
 }
 
 /**
  * error_127 - prints code 127 error message to stderr
  * @command: command that is not found
- * @program: program name
  */
 
-static void error_127(char *command, char *program)
+static void error_127(char *command)
 {
-	fprintf(stderr, "%s: 1: %s: not found\n", program, command);
+	fprintf(stderr, "%s: 1: %s: not found\n", prog.program, command);
 }
