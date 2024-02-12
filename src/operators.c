@@ -28,11 +28,17 @@ int route_operators(c_list *commands)
 			if (cmd_dt.op_array[cmd_dt.op_index] == 0x1)
 				colon_operator(tmp), last = 0x1;
 			else if (cmd_dt.op_array[cmd_dt.op_index] == 0x2)
-				continue;
+			{
+				if (!colon_operator(tmp))
+					break;
+			}
 			else if (cmd_dt.op_array[cmd_dt.op_index] == 0x3)
 				continue;
 			else if (cmd_dt.op_array[cmd_dt.op_index] == 0x4)
-				continue;
+			{
+				if (colon_operator(tmp))
+					break;
+			}
 			else if (cmd_dt.op_array[cmd_dt.op_index] == 0x5)
 				single_right_redirect(tmp), last = 0x5;
 			else if (cmd_dt.op_array[cmd_dt.op_index] == 0x6)
@@ -51,7 +57,7 @@ int route_operators(c_list *commands)
 /**
  * colon_operator - function for handling colon command operator
  * @commands: selected command segment input
- * Return: 0 on success, otherwise returns -1
+ * Return: 1 on success, otherwise returns 0
 */
 
 static int colon_operator(c_list *commands)
@@ -59,11 +65,14 @@ static int colon_operator(c_list *commands)
 	int launch_error = 0;
 
 	if (!commands)
-		return (-1);
+		return (0);
 	launch_error = launch_manager(commands->command);
-	if (launch_error == 13 || launch_error == 127)
+	if (launch_error == 2 || launch_error == 13 || launch_error == 127)
+	{
 		error_processor(commands->command, launch_error);
-	return (0);
+		return (0);
+	}
+	return (1);
 }
 
 /**
