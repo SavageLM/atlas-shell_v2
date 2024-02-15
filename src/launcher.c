@@ -6,6 +6,7 @@ static int PATH_str_mem_calc(char *PATH_str, char *command);
 static char **remove_colons(char *chop);
 static char **concat_slash_command(char **paths, char *command);
 static int fork_execute(char *name, char **cmd);
+static int fork_execute_pipe(char *name, char **cmd);
 
 /**
  * launcher - routes shell activity based on operator input
@@ -216,6 +217,8 @@ static int fork_execute(char *name, char **cmd)
 
 	if (!name || !cmd)
 		return (-1);
+	if (cmd_dt.op_array[cmd_dt.op_index] == 0x3)
+		return (fork_execute_pipe(name, cmd));
 	launch = fork();
 	if (launch == -1)
 		perror(name), exit(EXIT_FAILURE);
@@ -227,6 +230,47 @@ static int fork_execute(char *name, char **cmd)
 	else
 	{
 		waitpid(launch, &status, 0);
+		flag = WEXITSTATUS(status);
+		if (
+			flag == 2 && !isatty(STDIN_FILENO) &&
+			cmd_dt.cmd_index == cmd_dt.cmd_count
+		)
+			free_cmd_dt(), env_free(), _exit(flag);
+	}
+	return (flag);
+}
+
+/**
+ * fork_execute - launches input command with its arguments
+ * @name: command name used for error messages
+ * @cmd: arguments to the command
+ * Return: 1 upon success, -1 if input or cmd NULL
+ */
+
+static int fork_execute_pipe(char *name, char **cmd)
+{
+	pid_t launch = 0;
+	int status = 0, flag = 0;
+
+	if (!name || !cmd)
+		return (-1);
+	launch = fork();
+	if (launch == -1)
+		perror(name), exit(EXIT_FAILURE);
+	else if (launch == 0)
+	{
+		close(cmd_dt.pipe_fd[0]);
+		dup2(cmd_dt.pipe_fd[1], STDOUT_FILENO);
+		if (execve(name, cmd, environ) == -1)
+			perror(name), exit(EXIT_FAILURE);
+		close(cmd_dt.pipe_fd[1]);
+	}
+	else
+	{
+		waitpid(launch, &status, 0);
+		close(cmd_dt.pipe_fd[1]); /*  */
+		dup2(cmd_dt.pipe_fd[0], STDIN_FILENO);
+		close(cmd_dt.pipe_fd[0]);
 		flag = WEXITSTATUS(status);
 		if (
 			flag == 2 && !isatty(STDIN_FILENO) &&
