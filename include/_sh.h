@@ -74,6 +74,7 @@ typedef struct command_data
 	int op_array[16];
 	int op_add;
 	int op_index;
+	int pipe_fd[2];
 	struct command_list *commands;
 } c_dt;
 
