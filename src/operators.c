@@ -1,6 +1,8 @@
 #include "_sh.h"
 
 static int colon_operator(c_list *commands);
+static int pipeline(c_list *commands, int pipe_count);
+static int pipe_count(int *ops);
 static int single_right_redirect(c_list *commands);
 static int double_right_redirect(c_list *commands);
 static int single_left_redirect(c_list *commands);
@@ -15,7 +17,7 @@ static int double_left_redirect(c_list *commands);
 int route_operators(c_list *commands)
 {
 	c_list *tmp = NULL;
-	int last = 0x0;
+	int last = 0x0, pipes = 0;
 
 	for (
 		tmp = commands;
@@ -33,7 +35,10 @@ int route_operators(c_list *commands)
 					break;
 			}
 			else if (cmd_dt.op_array[cmd_dt.op_index] == 0x3)
-				continue;
+			{
+				pipes = pipe_count(&cmd_dt.op_array[cmd_dt.op_index]);
+				pipeline(tmp, pipes), last = 0x3;
+			}
 			else if (cmd_dt.op_array[cmd_dt.op_index] == 0x4)
 			{
 				if (colon_operator(tmp))
@@ -73,6 +78,52 @@ static int colon_operator(c_list *commands)
 		return (0);
 	}
 	return (1);
+}
+
+/**
+ * pipeline - function designed to process pipeline
+ * @commands: selected command segment input
+ * @pipe_count: number of pipes to be processed
+ * Return: number of pipes processed, -1 otherwise
+*/
+
+static int pipeline(c_list *commands, int pipe_count)
+{
+	c_list *tmp = NULL;
+	int launch_error = 0, pipes_piped = 0, iter = 0;
+
+	if (!commands || !commands->next->command[0] || !pipe_count)
+		return (-1);
+	pipe(cmd_dt.pipe_fd);
+	for (
+			tmp = commands;
+			tmp;
+			tmp = tmp->next, iter++, pipes_piped++
+	)
+	{
+		launch_manager(tmp->command);
+		if (launch_error)
+			error_processor(tmp->command, launch_error);
+	}
+	colon_operator(tmp);
+	return (pipes_piped);
+}
+
+/**
+ * pipe_count - counts number of successive pipes in commmand line input
+ * @ops: array of operators pulled from input
+ * Return: number of pipes
+*/
+
+static int pipe_count(int *ops)
+{
+	int pipes = 0, iter = 0;
+
+	if (!ops)
+		return (-1);
+	for (; ops[iter] == 0x3; pipes++, iter++)
+		;
+	return (pipes);
 }
 
 /**
@@ -153,14 +204,24 @@ static int single_left_redirect(c_list *commands)
 	{
 		dup2(fd, STDIN_FILENO);
 		launch_error = launch_manager(commands->command);
-		if (launch_error == 2 || launch_error == 13 || launch_error == 127)
+		if (launch_error)
 			error_processor(commands->command, launch_error);
 		close(fd);
 		dup2(redir_in, STDIN_FILENO);
 		close(redir_in);
 	}
 	else
+	{
+		if (errno == ENOENT)
+		{
+			fprintf(
+				stderr, "%s: 1: cannot open %s: No such file\n",
+				prog.program, commands->next->command[0]
+			);
+			error_processor(commands->command, 2);
+		}
 		return (-1);
+	}
 	return (0);
 }
 

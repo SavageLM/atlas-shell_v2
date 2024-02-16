@@ -7,6 +7,7 @@
 #define MAX_LEN 1024
 #define MAX_WRITE (1024 * 1024 * 2)
 
+#include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
 #include <stdio.h>
@@ -73,6 +74,7 @@ typedef struct command_data
 	int op_array[16];
 	int op_add;
 	int op_index;
+	int pipe_fd[2];
 	struct command_list *commands;
 } c_dt;
 

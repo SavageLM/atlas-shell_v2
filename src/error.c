@@ -17,8 +17,19 @@ void error_processor(char **cmd, int code)
 		error_127(cmd[0]);
 	if (!isatty(STDIN_FILENO) && cmd_dt.op_array[cmd_dt.op_index] != 0x4)
 	{
-		if (cmd_dt.op_count && cmd_dt.op_array[cmd_dt.op_index] != 0x2)
+		if (
+			cmd_dt.op_count &&
+			(
+				cmd_dt.op_array[cmd_dt.op_index] == 0x5 ||
+				cmd_dt.op_array[cmd_dt.op_index] == 0x6
+			)
+		)
 			code = 0;
+		if (
+			cmd_dt.op_array[cmd_dt.op_index] == 0x1 &&
+			cmd_dt.cmd_index < cmd_dt.cmd_count
+		)
+			return;
 		free_cmd_dt(), exit(code);
 	}
 }
