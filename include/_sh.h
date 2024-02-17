@@ -62,6 +62,7 @@ typedef struct command_list
  * @op_array: sequence of detected control/redirect operators
  * @op_add: count to verify op added at each position
  * @op_index: index to keep track of which operators have already been done
+ * @pipe_fd: array of file descriptors for pipe
  * @commands: doubly-linked list containing commands in sequence as entered
 */
 
