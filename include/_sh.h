@@ -97,7 +97,7 @@ void free_strv(char **command);
 
 /* launcher.c */
 int launcher(c_list *commands);
-int launch_manager(char **cmd);
+int launch_manager(c_list *cmd);
 
 /* memory_tools.c */
 void *_calloc(size_t num, size_t size);

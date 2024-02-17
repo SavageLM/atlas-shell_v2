@@ -1,0 +1,239 @@
+.\" Manpage for "SHELL_V2" A simple shell implimentation
+
+.TH HSH "shell_v2" "SHELL_V2"
+
+.SH NAME
+
+\fBhsh\fR - Simulates simplified UNIX shell that handles multiple commands.
+
+.SH SYNOPSIS
+
+\fB./hsh\fR [OPTIONS] [COMMAND_STRING | file]
+
+.SH DESCRIPTION
+
+This program simulates a command interpreter based in UNIX and GNU/LINUX with its basic commands.
+hsh is used by the operating system to control the execution of commands.
+hsh is not expected to be an exact implementation of bash, yet it is able to work with the most commonly used basic functions.
+
+.SH OVERVIEW
+
+hsh is an application that reads lines from either file or
+terminal input, interprets them, and generally executes other commands. hsh
+implements a language that has flow control constructs, a macro
+facility that provides a variety of features in addition to data storage,
+along with possibility for future built in history and line editing capability
+features. It
+incorporates many features to aid interactive use and has the advantage
+that the interpretative language is common to both interactive and non-
+interactive use (shell scripts).  That is, commands can be typed
+directly to the running shell or can be put into a file and the file
+can be executed directly by hsh.
+
+.br
+.\&
+.RS
+\&> ./hsh
+
+The prompt '# ' will appear on terminal - you may enter commands once it appears. Commands may be separated by control or redirect operators including:
+
+.RS
+[ ; && || > >> < ]
+
+| (pipe) operator supported only marginally.
+
+<< (heredoc) is currently not supported.
+.RE
+.RE
+
+Once desired commands have been entered, the process of their execution will begin once the ENTER key has been pressed.
+
+.B Interactive mode
+
+Commands are run with user-interaction from keyboard followed by return to prompt.
+
+.B Non-interactive mode
+
+Shell runs from an automated process of command piped to the shell executable and cannot currently request input or assume that further input may occur.
+
+
+.SH FEATURES
+.br
+* This program displays a prompt and waits for the user to type a command. Command line input is performed by pressing ENTER key.
+
+* The prompt is displayed again each time a command has been executed in interactive mode.
+
+* When the user enters exit, hsh will end with status 0.
+
+.RS
+User may enter desired code to exit with that code e.g. exit 144.
+.RE
+
+* Otherwise, user may exit the program using CTRL+D (end of file).
+
+* Program does not exit when user inputs ^C (CTRL+C).
+
+* Handles successive command line inputs with arguments and pathways.
+
+* Change working directory using cd.
+
+* View and manipulate environment variable values using env, setenv, unsetenv.
+
+* Executes programs stored in PATH locations along with arguments.
+
+* When command cannot be found, an error message is printed and returns user to the prompt.
+
+* Current version only marginally supports pipes | and does not support heredoc <<.
+
+* Does not currently support commentaries using #.
+
+* Does not currently support wildcard characters or quotes in any situation.
+
+.SH BUILT-IN COMMANDS
+.br
+
+\fBcd [DESTINATION]/[-]\fR - Changes current working directory to directory specified.
+
+.RS
+# cd /home ; pwd
+.br
+/home
+.RE
+.br
+
+\fBenv\fR - Lists environmental variables.
+
+.RS
+# env
+.br
+SHELL=/bin/bash
+.br
+USER=user
+.br
+HOME=/home/user
+.br
+[...]
+.RE
+.br
+
+\fBexit [STATUS..]\fR - Exits application with desired status code or 0 if unspecified.
+
+.RS
+# exit
+.br
+root@user:atlas-shell_v2#
+.br
+root@user:atlas-shell_v2# echo $?
+.br
+0
+.RE
+.br
+
+\fBsetenv [NAME] [VALUE]\fR - Sets or creates environmental variable of specified name and value.
+
+.RS
+# setenv VAR val
+.br
+# env
+.br
+[...]
+.br
+VAR=val
+.RE
+.br
+
+\fBunsetenv [NAME]\fR - Clears/removes variable of specified name from environmental variables.
+
+.RS
+# env ; unsetenv VAR ; echo UNSET ; env
+.br
+[...]
+.br
+VAR=val
+.br
+[...]
+.br
+UNSET
+.br
+[...]
+.br
+[...]
+.br
+.RE
+
+.SH OTHER COMMAND EXAMPLES AND OUTPUTS
+.br
+\fBls [OPTIONS..]\fR - Lists the the files and/or directories in specified directory.
+
+.RS
+# ls -1
+.br
+AUTHORS
+.br
+build
+.br
+hsh
+.br
+hsh-debug
+.br
+include
+.br
+Makefile
+.br
+man_1_hsh
+.br
+README.md
+.br
+src
+.RE
+.br
+
+\fBecho [OPTIONS..] string..\fR - displays a line of text
+
+.RS
+# echo Hello World
+.br
+Hello World
+.RE
+.br
+
+\fBpwd [OPTIONS..]\fR - Prints the working directory
+
+.RS
+# pwd
+.br
+/home/user/Documents/atlas-shell_v2
+.RE
+.br
+
+\fBCTRL + D\fR - (EOF) Exits current program
+
+.RS
+# ^D
+.br
+root@user:atlas-shell_v2#
+.RE
+.br
+
+\fBexit\fR - exits the shell
+
+.RS
+# exit
+.br
+root@user:atlas-shell_v2#
+.RE
+.br
+
+.SH BUGS
+
+.TP
+Usage of single pipe between two commands leads to exit following execution. Multiple pipes cause unexpected errors.
+
+.TP
+setenv command occasionally causes invalid reads/writes.
+
+.SH AUTHOR(S)
+
+Sammy Ansari <sam.ansari@atlasschool.com>
+.LP
+Logan Savage <logan.savage@atlasschool.com>
