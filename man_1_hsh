@@ -19,16 +19,13 @@ hsh is not expected to be an exact implementation of bash, yet it is able to wor
 .SH OVERVIEW
 
 hsh is an application that reads lines from either file or
-terminal input, interprets them, and generally executes other commands. hsh
+terminal input, parses these lines, and executes as applicable. hsh
 implements a language that has flow control constructs, a macro
 facility that provides a variety of features in addition to data storage,
-along with possibility for future built in history and line editing capability
-features. It
+along with possibility for future implementation of built-in history and line editing features. It
 incorporates many features to aid interactive use and has the advantage
 that the interpretative language is common to both interactive and non-
-interactive use (shell scripts).  That is, commands can be typed
-directly to the running shell or can be put into a file and the file
-can be executed directly by hsh.
+interactive use.
 
 .br
 .\&
@@ -202,7 +199,7 @@ Hello World
 .RS
 # pwd
 .br
-/home/user/Documents/atlas-shell_v2
+/home/user/Project/atlas-shell_v2
 .RE
 .br
 
