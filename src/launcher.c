@@ -5,8 +5,8 @@ static char **PATH_processing(char *command);
 static int PATH_str_mem_calc(char *PATH_str, char *command);
 static char **remove_colons(char *chop);
 static char **concat_slash_command(char **paths, char *command);
-static int fork_execute(char *name, char **cmd);
-static int fork_execute_pipe(char *name, char **cmd);
+static int fork_execute(char *name, c_list *cmd);
+static int fork_execute_pipe(char *name, c_list *cmd);
 
 /**
  * launcher - routes shell activity based on operator input
@@ -20,7 +20,7 @@ int launcher(c_list *commands)
 
 	if (!cmd_dt.op_count)
 	{
-		launch_error = launch_manager(commands->command);
+		launch_error = launch_manager(commands);
 		if (launch_error == 13 || launch_error == 127)
 			error_processor(commands->command, launch_error);
 	}
@@ -36,25 +36,24 @@ int launcher(c_list *commands)
  * Return: 0 success, 1 built-in called, otherwise respective err no.
  */
 
-int launch_manager(char **cmd)
+int launch_manager(c_list *cmd)
 {
 	int iter = 0, tag = 0, problem = 0, f_ex_err = 0;
-	char **full_paths = NULL;
+	char **full_paths = NULL, *name = cmd->command[0];
 
 	problem = check_PATH_PWD();
-	if (builtin(cmd))
+	if (builtin(cmd->command))
 		return (1);
-	if (access(cmd[0], F_OK) == -1)
+	if (access(name, F_OK) == -1)
 	{
 		if (problem == 1)
 			return (127);
-		full_paths = PATH_processing(cmd[0]);
+		full_paths = PATH_processing(name);
 		if (!full_paths)
 			return (127);
 		for (iter = 0; full_paths[iter]; iter++)
 			if (!access(full_paths[iter], X_OK))
-			{
-				f_ex_err = fork_execute(full_paths[iter], cmd), tag = 1;
+			{f_ex_err = fork_execute(full_paths[iter], cmd), tag = 1;
 				break;
 			}
 		for (iter = 0; full_paths[iter]; iter++)
@@ -63,13 +62,13 @@ int launch_manager(char **cmd)
 	}
 	else
 	{
-		if (!access(cmd[0], X_OK))
+		if (!access(name, X_OK))
 		{
-			if (problem == 1 && cmd[0][0] != '/')
+			if (problem == 1 && name[0] != '/')
 				return (127);
-			f_ex_err = fork_execute(cmd[0], cmd), tag = 1;
+			f_ex_err = fork_execute(name, cmd), tag = 1;
 		}
-		else if (!access(cmd[0], F_OK) && access(cmd[0], X_OK) == -1)
+		else if (!access(name, F_OK) && access(name, X_OK) == -1)
 			return (13);
 	}
 	return (!tag ? 127 : f_ex_err ? f_ex_err : 0);
@@ -210,7 +209,7 @@ static char **concat_slash_command(char **paths, char *command)
  * Return: 1 upon success, -1 if input or cmd NULL
  */
 
-static int fork_execute(char *name, char **cmd)
+static int fork_execute(char *name, c_list *cmd)
 {
 	pid_t launch = 0;
 	int status = 0, flag = 0;
@@ -224,7 +223,7 @@ static int fork_execute(char *name, char **cmd)
 		perror(name), exit(EXIT_FAILURE);
 	else if (launch == 0)
 	{
-		if (execve(name, cmd, environ) == -1)
+		if (execve(name, cmd->command, environ) == -1)
 			perror(name), exit(EXIT_FAILURE);
 	}
 	else
@@ -241,13 +240,13 @@ static int fork_execute(char *name, char **cmd)
 }
 
 /**
- * fork_execute - launches input command with its arguments
+ * fork_execute_pipe - launches piped input command with its arguments
  * @name: command name used for error messages
  * @cmd: arguments to the command
  * Return: 1 upon success, -1 if input or cmd NULL
  */
 
-static int fork_execute_pipe(char *name, char **cmd)
+static int fork_execute_pipe(char *name, c_list *cmd)
 {
 	pid_t launch = 0;
 	int status = 0, flag = 0;
@@ -261,7 +260,7 @@ static int fork_execute_pipe(char *name, char **cmd)
 	{
 		close(cmd_dt.pipe_fd[0]);
 		dup2(cmd_dt.pipe_fd[1], STDOUT_FILENO);
-		if (execve(name, cmd, environ) == -1)
+		if (execve(name, cmd->command, environ) == -1)
 			perror(name), exit(EXIT_FAILURE);
 		close(cmd_dt.pipe_fd[1]);
 	}

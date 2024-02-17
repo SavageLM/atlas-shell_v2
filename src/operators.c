@@ -10,21 +10,16 @@ static int double_left_redirect(c_list *commands);
 
 /**
  * route_operators - manages command launches when operators present
- * @commands: head of linked list of commands
+ * @cmd: head of linked list of commands
  * Return: 0 upon success
 */
 
-int route_operators(c_list *commands)
+int route_operators(c_list *cmd)
 {
 	c_list *tmp = NULL;
 	int last = 0x0, pipes = 0;
 
-	for (
-		tmp = commands;
-		tmp;
-		tmp = tmp->next, cmd_dt.op_index++, cmd_dt.cmd_index++
-	)
-	{
+	for (tmp = cmd; tmp; tmp = tmp->next, cmd_dt.op_index++, cmd_dt.cmd_index++)
 		if (tmp->command[0])
 		{
 			if (cmd_dt.op_array[cmd_dt.op_index] == 0x1)
@@ -55,7 +50,6 @@ int route_operators(c_list *commands)
 			else if (tmp->cmd_index == cmd_dt.cmd_count && last <= 0x4 && last != 0x3)
 				colon_operator(tmp);
 		}
-	}
 	return (0);
 }
 
@@ -71,7 +65,7 @@ static int colon_operator(c_list *commands)
 
 	if (!commands)
 		return (0);
-	launch_error = launch_manager(commands->command);
+	launch_error = launch_manager(commands);
 	if (launch_error == 2 || launch_error == 13 || launch_error == 127)
 	{
 		error_processor(commands->command, launch_error);
@@ -90,7 +84,7 @@ static int colon_operator(c_list *commands)
 static int pipeline(c_list *commands, int pipe_count)
 {
 	c_list *tmp = NULL;
-	int launch_error = 0, pipes_piped = 0, iter = 0;
+	int launch_error = 0, pipes_piped = 0;
 
 	if (!commands || !commands->next->command[0] || !pipe_count)
 		return (-1);
@@ -98,10 +92,10 @@ static int pipeline(c_list *commands, int pipe_count)
 	for (
 			tmp = commands;
 			tmp;
-			tmp = tmp->next, iter++, pipes_piped++
+			tmp = tmp->next, pipes_piped++
 	)
 	{
-		launch_manager(tmp->command);
+		launch_manager(tmp);
 		if (launch_error)
 			error_processor(tmp->command, launch_error);
 	}
@@ -143,7 +137,7 @@ static int single_right_redirect(c_list *commands)
 	if (fd != -1)
 	{
 		dup2(fd, STDOUT_FILENO);
-		launch_error = launch_manager(commands->command);
+		launch_error = launch_manager(commands);
 		if (launch_error == 13 || launch_error == 127)
 			error_processor(commands->command, launch_error);
 		fflush(stdout);
@@ -173,7 +167,7 @@ static int double_right_redirect(c_list *commands)
 	if (fd != -1)
 	{
 		dup2(fd, STDOUT_FILENO);
-		launch_error = launch_manager(commands->command);
+		launch_error = launch_manager(commands);
 		if (launch_error == 13 || launch_error == 127)
 			error_processor(commands->command, launch_error);
 		fflush(stdout);
@@ -203,7 +197,7 @@ static int single_left_redirect(c_list *commands)
 	if (fd != -1)
 	{
 		dup2(fd, STDIN_FILENO);
-		launch_error = launch_manager(commands->command);
+		launch_error = launch_manager(commands);
 		if (launch_error)
 			error_processor(commands->command, launch_error);
 		close(fd);
