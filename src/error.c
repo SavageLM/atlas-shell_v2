@@ -15,8 +15,10 @@ void error_processor(char **cmd, int code)
 		error_13(cmd[0]);
 	else if (code == 127)
 		error_127(cmd[0]);
+	/*Checks for invalid file discriptor and command operator at index is not 4*/
 	if (!isatty(STDIN_FILENO) && cmd_dt.op_array[cmd_dt.op_index] != 0x4)
 	{
+		/*If command operator at index is 5 or 6, sets code to 0*/
 		if (
 			cmd_dt.op_count &&
 			(
@@ -25,6 +27,7 @@ void error_processor(char **cmd, int code)
 			)
 		)
 			code = 0;
+		/*If command operator is 1, and command index is less than command count*/
 		if (
 			cmd_dt.op_array[cmd_dt.op_index] == 0x1 &&
 			cmd_dt.cmd_index < cmd_dt.cmd_count

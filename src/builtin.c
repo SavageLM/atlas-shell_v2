@@ -19,6 +19,7 @@ int builtin(char **command)
 {
 	int match = 0;
 
+	/*Comparing input command to list of built ins and arguements*/
 	if (*command)
 	{
 		if (!_strcmp(command[0], "cd"))
@@ -46,10 +47,12 @@ static int builtin_cd(char *path)
 	char *home = NULL, *oldpwd = NULL, cwd[MAX_LEN];
 	int changed = 0;
 
+	/*Retrieves current working Directory*/
 	if (!getcwd(cwd, MAX_LEN))
 		return (-1);
 	if (path)
 	{
+		/*Checks for Valid path, Then looks for an old working dir*/
 		if (_strlen(path) == 1 && path[0] == '-')
 		{
 			oldpwd = _getenv("OLDPWD");
@@ -60,9 +63,11 @@ static int builtin_cd(char *path)
 				printf("%s\n", cwd);
 			free(oldpwd), oldpwd = NULL;
 		}
+		/*If no Old dir, change dir to path*/
 		else
 			cd_helper(path, &changed);
 	}
+	/*Checks for root dir*/
 	else
 	{
 		home = _getenv("HOME");
@@ -89,6 +94,7 @@ static int cd_helper(char *go_here, int *changed)
 		return (-1);
 	if (lstat(go_here, &buffer) != -1)
 	{
+		/*Tries to change dir, On fail, sets env to current dir*/
 		if (!chdir(go_here))
 			builtin_setenv("OLDPWD", hold_pwd),
 			getcwd(hold_pwd, MAX_LEN),
@@ -128,6 +134,7 @@ static int builtin_exit(char *code, char **cmd)
 
 	if (code)
 	{
+		/*Checks for invalid exit codes*/
 		for (; code[iter]; iter++)
 			if (!_isdigit(code[iter]))
 			{
@@ -136,6 +143,7 @@ static int builtin_exit(char *code, char **cmd)
 			}
 		status = _atoi(code);
 	}
+	/*Handler for invalid exit codes*/
 	if (invalid || status < 0)
 		fprintf(stderr, "./hsh: 1: %s: Illegal number: %s\n", cmd[0], code),
 		status = 2;
@@ -158,27 +166,33 @@ static int builtin_setenv(char *name, char *value)
 
 	if (!name || !value)
 		return (-1);
+	/*Loops through environment list to match to name*/
 	for (; prog.env_list[iter]; iter++)
 		if (!_strncmp(prog.env_list[iter], name, _strlen(name)))
 			break;
 	value_str = malloc(sizeof(char) * (_strlen(name) + _strlen(value) + 2));
 	if (!value_str)
 		return (-1);
+	/*Copying name variable and modifying for adding to environ list*/
 	_strcpy(value_str, name);
 	_strcat(value_str, "=");
 	_strcat(value_str, value);
+	/*If env list is valid at index, Adding value to env list*/
 	if (prog.env_list[iter])
 		_strcpy(prog.env_list[iter], value_str);
 	else
 	{
+		/*extending env_list*/
 		env_cpy = _realloc(
 			(char *)prog.env_list,
 			(iter) * sizeof(char *),
 			(iter + 2) * sizeof(char *));
 		if (!env_cpy)
 			return (-1);
+		/*mapping memory*/
 		_memcpy((char *)env_cpy, (char *)environ, iter * sizeof(char *));
 		prog.env_list_size++;
+		/*Adding value to env list*/
 		env_cpy[iter] = _strdup(value_str);
 		env_cpy[iter + 1] = NULL;
 		prog.env_list = environ = env_cpy;
@@ -200,8 +214,10 @@ static int builtin_unsetenv(char *name)
 
 	if (!name)
 		return (-1);
+	/*Looping through env list, compare to name*/
 	for (env_var = prog.env_list, var_len = _strlen(name); *env_var; iter++)
 	{
+		/*On match, removes vaar from list and shrinks list*/
 		if (!_strncmp(*env_var, name, var_len) && (*env_var)[var_len] == '=')
 		{
 			tmp = *env_var;

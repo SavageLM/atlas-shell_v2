@@ -11,6 +11,7 @@ char *separator(char **input, char *delim)
 {
 	char *extract_str = NULL;
 
+	/*Loops through input str and seperates based delimiter*/
 	while ((extract_str = _strsep(input, delim)) && !*extract_str)
 		;
 	return (extract_str);
@@ -48,7 +49,9 @@ size_t _strcspn(const char *str, const char *ref)
 {
 	const char *comp1 = NULL, *comp2 = NULL;
 
+	/*looping through str1*/
 	for (comp1 = str; *comp1; ++comp1)
+		/*looping through str 2 and comparing to str 1*/
 		for (comp2 = ref; *comp2; ++comp2)
 			if (*comp1 == *comp2)
 				return (comp1 - str);

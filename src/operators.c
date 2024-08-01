@@ -19,6 +19,7 @@ int route_operators(c_list *cmd)
 	c_list *tmp = NULL;
 	int last = 0x0, pipes = 0;
 
+	/*Loops through command operators and routes to proper functions*/
 	for (tmp = cmd; tmp; tmp = tmp->next, cmd_dt.op_index++, cmd_dt.cmd_index++)
 		if (tmp->command[0])
 		{
@@ -65,6 +66,7 @@ static int colon_operator(c_list *commands)
 
 	if (!commands)
 		return (0);
+	/*Handles command with Launch manager*/
 	launch_error = launch_manager(commands);
 	if (launch_error == 2 || launch_error == 13 || launch_error == 127)
 	{
@@ -89,6 +91,7 @@ static int pipeline(c_list *commands, int pipe_count)
 	if (!commands || !commands->next->command[0] || !pipe_count)
 		return (-1);
 	pipe(cmd_dt.pipe_fd);
+	/*Loops through commands that need piped*/
 	for (
 			tmp = commands;
 			tmp;
@@ -115,6 +118,7 @@ static int pipe_count(int *ops)
 
 	if (!ops)
 		return (-1);
+	/*Loops through operators and counts pipes*/
 	for (; ops[iter] == 0x3; pipes++, iter++)
 		;
 	return (pipes);
@@ -133,14 +137,17 @@ static int single_right_redirect(c_list *commands)
 
 	if (!commands || !commands->next->command[0] || commands->next->command[1])
 		return (-1);
+	/*Opens a file to direct output to*/
 	fd = open(commands->next->command[0], O_WRONLY | O_CREAT | O_TRUNC, 0644);
 	if (fd != -1)
 	{
+		/*Runs command with launch manager and directs output to a file*/
 		dup2(fd, STDOUT_FILENO);
 		launch_error = launch_manager(commands);
 		if (launch_error == 13 || launch_error == 127)
 			error_processor(commands->command, launch_error);
 		fflush(stdout);
+		/*Closing opened files*/
 		close(fd);
 		dup2(redir_out, STDOUT_FILENO);
 		close(redir_out);
@@ -163,14 +170,17 @@ static int double_right_redirect(c_list *commands)
 
 	if (!commands || !commands->next->command[0] || commands->next->command[1])
 		return (-1);
+	/*Opens file to append data to*/
 	fd = open(commands->next->command[0], O_WRONLY | O_CREAT | O_APPEND, 0644);
 	if (fd != -1)
 	{
+		/*Runs command with launch manager and directs output to a file*/
 		dup2(fd, STDOUT_FILENO);
 		launch_error = launch_manager(commands);
 		if (launch_error == 13 || launch_error == 127)
 			error_processor(commands->command, launch_error);
 		fflush(stdout);
+		/*Closing Files*/
 		close(fd);
 		dup2(redir_out, STDOUT_FILENO);
 		close(redir_out);
@@ -193,19 +203,23 @@ static int single_left_redirect(c_list *commands)
 
 	if (!commands || !commands->next->command[0] || commands->next->command[1])
 		return (-1);
+	/*Opens file to perform command on*/
 	fd = open(commands->next->command[0], O_RDONLY, 0644);
 	if (fd != -1)
 	{
+		/*Runs command with input from file*/
 		dup2(fd, STDIN_FILENO);
 		launch_error = launch_manager(commands);
 		if (launch_error)
 			error_processor(commands->command, launch_error);
+		/*Close Files*/
 		close(fd);
 		dup2(redir_in, STDIN_FILENO);
 		close(redir_in);
 	}
 	else
 	{
+		/*Processes Errors*/
 		if (errno == ENOENT)
 		{
 			fprintf(

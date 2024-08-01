@@ -44,30 +44,36 @@ int launch_manager(c_list *cmd)
 	problem = check_PATH_PWD();
 	if (builtin(cmd->command))
 		return (1);
+	/* If does command does not exist*/
 	if (access(name, F_OK) == -1)
 	{
 		if (problem == 1)
 			return (127);
+		/*Processes PATH env var for stat/access*/
 		full_paths = PATH_processing(name);
 		if (!full_paths)
 			return (127);
+		/*Loops through PATH, if access is OK, runs fork execute*/
 		for (iter = 0; full_paths[iter]; iter++)
 			if (!access(full_paths[iter], X_OK))
 			{f_ex_err = fork_execute(full_paths[iter], cmd), tag = 1;
 				break;
 			}
+		/*Loops through and frees path var*/
 		for (iter = 0; full_paths[iter]; iter++)
 			free(full_paths[iter]), full_paths[iter] = NULL;
 		free(full_paths);
 	}
 	else
 	{
+		/*If command is executable, runs fork execute*/
 		if (!access(name, X_OK))
 		{
 			if (problem == 1 && name[0] != '/')
 				return (127);
 			f_ex_err = fork_execute(name, cmd), tag = 1;
 		}
+		/*Checks if command exists, and if it is not an executeable*/
 		else if (!access(name, F_OK) && access(name, X_OK) == -1)
 			return (13);
 	}
@@ -117,13 +123,16 @@ static char **PATH_processing(char *command)
 
 	if (!command)
 		return (NULL);
+	/*Retrieving env*/
 	PATH_str = _getenv("PATH");
 	if (!PATH_str)
 		return (NULL);
+	/*Calculates memory to be allocated for PATH*/
 	mem_size = PATH_str_mem_calc(PATH_str, command);
 	del = malloc(sizeof(char) * mem_size);
 	if (!del)
 		return (NULL);
+	/*Copy Path str and run through formating functions*/
 	_strcpy(del, PATH_str);
 	paths = remove_colons(del);
 	search_paths = concat_slash_command(paths, command);
@@ -142,10 +151,12 @@ static int PATH_str_mem_calc(char *PATH_str, char *command)
 {
 	int iter = 0, bytes = 0;
 
+	/*Loops through Path str and counts number of bytes needed*/
 	for (; PATH_str[iter]; iter++)
 		if (PATH_str[iter] == ':')
 			bytes++;
 	bytes++;
+	/*Adding in bytes for command*/
 	bytes *= (_strlen(command) + 1);
 	bytes += (_strlen(PATH_str) + 1);
 	return (bytes);
@@ -167,6 +178,7 @@ static char **remove_colons(char *colon_str)
 	paths = malloc(sizeof(char *) + MAX_LEN);
 	if (!paths)
 		return (NULL);
+	/*Runs through str and formats them to remove colons*/
 	for (copy = colon_str; (paths[iter] = separator(&copy, ":")); iter++)
 		;
 	return (paths);
@@ -193,6 +205,7 @@ static char **concat_slash_command(char **paths, char *command)
 		return (NULL);
 	slash_str[0] = '/', slash_str[1] = '\0';
 	slash_command = _strcat(slash_str, command);
+	/*Looping through paths and adding '/' between commands*/
 	for (; paths[iter]; iter++)
 	{
 		path = str_concat(paths[iter], slash_command);
@@ -219,15 +232,18 @@ static int fork_execute(char *name, c_list *cmd)
 	if (cmd_dt.op_array[cmd_dt.op_index] == 0x3)
 		return (fork_execute_pipe(name, cmd));
 	launch = fork();
+	/*Forks process to run command*/
 	if (launch == -1)
 		perror(name), exit(EXIT_FAILURE);
 	else if (launch == 0)
 	{
+		/*executes command in fork*/
 		if (execve(name, cmd->command, environ) == -1)
 			perror(name), exit(EXIT_FAILURE);
 	}
 	else
 	{
+		/*Parent process waiting for Child to finish*/
 		waitpid(launch, &status, 0);
 		flag = WEXITSTATUS(status);
 		if (
@@ -258,6 +274,7 @@ static int fork_execute_pipe(char *name, c_list *cmd)
 		perror(name), exit(EXIT_FAILURE);
 	else if (launch == 0)
 	{
+		/*Setting up pipe in Child, executing command*/
 		close(cmd_dt.pipe_fd[0]);
 		dup2(cmd_dt.pipe_fd[1], STDOUT_FILENO);
 		if (execve(name, cmd->command, environ) == -1)
@@ -266,10 +283,12 @@ static int fork_execute_pipe(char *name, c_list *cmd)
 	}
 	else
 	{
+		/*Waiting for Child process to finish, run second pipe*/
 		waitpid(launch, &status, 0);
 		close(cmd_dt.pipe_fd[1]); /*  */
 		dup2(cmd_dt.pipe_fd[0], STDIN_FILENO);
 		close(cmd_dt.pipe_fd[0]);
+		/*Checking exit codes*/
 		flag = WEXITSTATUS(status);
 		if (
 			flag == 2 && !isatty(STDIN_FILENO) &&

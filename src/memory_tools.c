@@ -19,6 +19,7 @@ void *_calloc(size_t num, size_t size)
 	memory = malloc(num * size);
 	if (!memory)
 		return (NULL);
+	/*Loops through memory and initialize to 0*/
 	for (iter = 0, initialize = memory; iter != (size * num); iter++)
 		initialize[iter] = '\0';
 	return (memory);
@@ -38,6 +39,7 @@ char *_memcpy(char *dest, char *src, unsigned int n)
 
 	if (!n)
 		return (NULL);
+	/*Loops though and copys source to destination*/
 	for (; iter != n; iter++)
 		dest[iter] = src[iter];
 	return (dest);
@@ -63,6 +65,7 @@ void *_realloc(void *memory, size_t old_size, size_t new_size)
 	}
 	else
 	{
+		/*If there is not enough memory, allocates more*/
 		if (old_size < new_size)
 		{
 			new_mem = malloc(new_size);
@@ -115,12 +118,16 @@ char *str_concat(char *dest, char *src)
 		dest = "";
 	if (!src)
 		src = "";
+	/*Grabs len of str*/
 	dest_len = _strlen(dest), src_len = _strlen(src) + 1;
+	/*Allocates memory for new string*/
 	ret_str = malloc(sizeof(char) * (dest_len + src_len));
 	if (!ret_str)
 		return (NULL);
+	/*copys str to add to to new str*/
 	for (; dest[dest_iter]; dest_iter++)
 		ret_str[dest_iter] = dest[dest_iter];
+	/*Adds string to add to new new str*/
 	for (; src[src_iter]; dest_iter++, src_iter++)
 		ret_str[dest_iter] = src[src_iter];
 	ret_str[dest_iter] = '\0';

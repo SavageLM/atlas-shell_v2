@@ -16,6 +16,7 @@ char *_getenv(char *var_name)
 	if (!var_name)
 		return (NULL);
 	var_eq = str_concat(var_name, "=");
+	/*Looping through environment list to find match for env variable*/
 	for (iter = 0, var_def = _strlen(var_eq); prog.env_list[iter]; iter++)
 		if (!_strncmp(prog.env_list[iter], var_eq, var_def))
 		{
@@ -27,6 +28,7 @@ char *_getenv(char *var_name)
 		if (_strlen(capture) != var_def)
 		{
 			env_var = _strdup(capture), capture = NULL;
+			/* Looping through env_var to seperate based on "="*/
 			for (iter = 0, env_copy = env_var;
 				(split[iter] = separator(&env_copy, "=")); iter++)
 				;
@@ -36,5 +38,6 @@ char *_getenv(char *var_name)
 		free_strv(split);
 	}
 	free(var_eq), var_eq = NULL;
+	/*Free all allocated memory no longer needed before return*/
 	return (value_str ? value_str : NULL);
 }

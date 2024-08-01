@@ -18,10 +18,14 @@ int parser(char *input)
 
 	if (!input)
 		return (-1);
+	/*Detect compatible operators*/
 	detect_ops(input);
+	/*Parses out Operators*/
 	ops_parsed = parse_ops(input);
 	if (!ops_parsed)
+		/* adds node to command segment list */
 		add_cmd(input, &cmd_dt.commands);
+	/*Parses out Spaces*/
 	for (tmp = cmd_dt.commands; tmp; tmp = tmp->next)
 		parse_space(tmp);
 	return (0);
@@ -37,6 +41,7 @@ static void detect_ops(char *input)
 {
 	int iter = 0;
 
+	/*Loops through input for valid operators*/
 	for (; input[iter]; iter++)
 	{
 		if (input[iter] == ';')
@@ -70,11 +75,13 @@ static int parse_ops(char *input)
 
 	if (!input)
 		return (-1);
+	/*Seperates commands pased on operator delimiters*/
 	for (
 		inpt_cpy = input;
 		(extract_str = separator(&inpt_cpy, OPS));
 		cmd_dt.cmd_count++
 	)
+		/* adds node to command segment list */
 		add_cmd(extract_str, &cmd_dt.commands);
 	if (extract_str)
 		extract_str = NULL;
@@ -96,6 +103,7 @@ static int add_cmd(char *extract_str, c_list **commands)
 
 	if (!extract_str)
 		return (-1);
+	/*Allocates memory for node and sets up struct members*/
 	add = _calloc(sizeof(c_list), 1);
 	if (!add)
 		return (-1);
@@ -107,6 +115,7 @@ static int add_cmd(char *extract_str, c_list **commands)
 		*commands = add;
 	else
 	{
+		/*Addes Node to end of list*/
 		for (tmp = *commands; tmp; tmp = tmp->next)
 			if (!tmp->next)
 			{
@@ -131,6 +140,7 @@ static int parse_space(c_list *cmd)
 
 	if (!cmd)
 		return (-1);
+	/*Loops through input and removes spaces*/
 	for (
 		inpt_cpy = cmd->cmd_str;
 		(extract_str = separator(&inpt_cpy, SPC_DELIM));

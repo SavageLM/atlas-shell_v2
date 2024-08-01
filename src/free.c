@@ -11,9 +11,11 @@ void free_cmd_dt(void)
 
 	if (cmd_dt.commands)
 	{
+		/*Looping through command data and freeing them*/
 		for (; cmd_dt.commands; cmd_dt.commands = hold)
 		{
 			hold = cmd_dt.commands->next;
+			/*Looping through commands and freeing them*/
 			for (iter = 0; cmd_dt.commands->command[iter]; iter++)
 				if (cmd_dt.commands->command[iter])
 					free(cmd_dt.commands->command[iter]),

@@ -11,10 +11,12 @@ int _atoi(char *input_string)
 	int iter = 0, sign = 1, done = 0;
 	size_t out = 0;
 
+	/*Loops through input*/
 	for (; input_string[iter] != '\0'; iter++)
 	{
 		if (input_string[iter] == '-')
 			sign = -(sign);
+		/*Converts char input to int output*/
 		for (; input_string[iter] >= '0' && input_string[iter] <= '9'; iter++)
 			out = (out * 10) + (input_string[iter] - '0'), done = 1;
 		if (done)

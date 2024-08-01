@@ -21,16 +21,22 @@ int main(int __attribute__((unused)) argc, char **argv)
 	int prompt_ret = 0;
 
 	prog.program = argv[0];
+	/*Main Driver behind code*/
 	while (1)
 	{
 		cmd_dt.cmd_count = 0, cmd_dt.cmd_index = 1, cmd_dt.op_count = 0;
 		cmd_dt.op_add = 0, cmd_dt.op_index = 0;
+		/*Signal Handler*/
 		signal(SIGINT, signal_SIGINT);
+		/*Setting prompt to display*/
 		prompt_ret = prompt("# ", &cmd_dt.input, &input_len);
 		if (prompt_ret < 0)
 			continue;
+		/*Parses input into commands and operators*/
 		parser(cmd_dt.input);
+		/*Driver code for running seperated commands*/
 		launcher(cmd_dt.commands);
+		/*Functions for Freeing allocated memory created*/
 		free_cmd_dt();
 		fflush(stdout);
 	}
@@ -102,11 +108,13 @@ static ssize_t prompt(char *prompt_str, char **input, size_t *len)
 
 	if (isatty(STDIN_FILENO))
 		write(STDOUT_FILENO, prompt_str, _strlen(prompt_str));
+	/*Retrieving input from command line*/
 	getline_out = getline(input, len, stdin);
 	if (getline_out == EOF)
 		free(*input), exit(0);
 	else if (!getline_out)
 		return (-1);
+	/*Checking for empty inputs*/
 	if (empty_input(*input))
 		error = -2, free(*input), *input = NULL;
 	return (!error ? getline_out : error);
@@ -123,6 +131,7 @@ static int empty_input(char *input)
 	int iter = 0, spaces = 0;
 
 	if (input)
+	/*Parses input to check for */
 		for (; input[iter]; iter++)
 			if (
 				input[iter] == ' ' ||
